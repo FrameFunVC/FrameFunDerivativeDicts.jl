@@ -1,0 +1,30 @@
+name = "FrameFunDerivativeDicts"
+uuid = "a044d1c3-f59a-42f8-a12e-6f86ba36b853"
+authors = ["vincentcp"]
+version = "0.1"
+
+[deps]
+BasisFunctions = "4343a256-5453-507d-8aad-01a9d7189916"
+FrameFun = "bbafa164-4497-5d18-87cf-33e911f89480"
+GridArrays = "356ae075-8bc9-5ef9-a342-46c9ba26438c"
+LazyArrays = "5078a376-72f3-5289-bfd5-ec5146d43c02"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+MacroTools = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
+Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
+SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+SymbolicDifferentialOperators = "9bed4a80-4cf1-49c9-8068-ed85240b7fe1"
+
+[compat]
+SymbolicDifferentialOperators = "0.1"
+BasisFunctions = "0.2"
+FrameFun = "0.2"
+GridArrays = "0.1"
+Reexport = "0.2"
+MacroTools = "0.5"
+
+[extras]
+Calculus = "49dc2e85-a5d0-5ad3-a950-438e2897f1b9"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test","Calculus"]
