@@ -15,9 +15,9 @@ using SymbolicDifferentialOperators: AbstractDiffOperator, PartialDifferentialOp
     SumDifferentialOperator, full_elements
 
 
-(L::AbstractDiffOperator)(dict::Dictionary) = error("Influence of $(typeof(L)) on $(name(dict)) is unknown")
-(L::AbstractDiffOperator)(exp::Expansion) = expansion(L(dictionary(exp)), coefficients(exp))
-function (L::PartialDifferentialOperator)(dict::Dictionary)
+(L::AbstractDiffOperator)(dict) = error("Influence of $(typeof(L)) on $(typeof(dict)) is unknown")
+(L::ScaledDifferentialOperator)(exp::Expansion) = expansion(L(dictionary(exp)), coefficients(exp))
+function (L::PartialDifferentialOperator)(dict)
     if dimension(dict)==1
         diff(dict, 1)
     else
@@ -29,14 +29,14 @@ function (L::PartialDifferentialOperator)(dict::Dictionary)
     end
 end
 
-(L::ScaledDifferentialOperator)(dict::Dictionary) =
+(L::ScaledDifferentialOperator)(dict) =
     _eval(L.coeff, L.diff, dict)
 _eval(coef::IdentityCoefficient, diff, dict) =
     diff(dict)
 _eval(coef::ConstantCoefficient, diff, dict) =
     coef.scalar*diff(dict)
 
-function (L::ProductDifferentialOperator)(dict::Dictionary)
+function (L::ProductDifferentialOperator)(dict)
     diff_L = length(dimension_names(L))
     dict_L = dimension(dict)
     if diff_L == dict_L
@@ -49,15 +49,15 @@ function (L::ProductDifferentialOperator)(dict::Dictionary)
 
         diff(dict, (L.orders..., ntuple(k->0,Val(dict_L-diff_L))...))
     else
-        throw(DimensionMismatch("To many dimensions in $(typeof(L)) to act on $(name(dict))"))
+        throw(DimensionMismatch("To many dimensions in $(typeof(L)) to act on $(typeof(dict))"))
     end
 end
 
 
 using ..SummationDicts: laplace
-(::LaplaceOperator)(dict::Dictionary) = laplace(dict)
-(::IdentityDifferentialOperator)(dict::Dictionary) = dict
-function (L::SumDifferentialOperator)(dict::Dictionary)
+(::LaplaceOperator)(dict) = laplace(dict)
+(::IdentityDifferentialOperator)(dict) = dict
+function (L::SumDifferentialOperator)(dict)
     if dimension(dict) != length(dimension_names(L))
         throw(DimensionMismatch("To dimensions in $(typeof(L)) ($(length(dimension_names(L)))) do not match the dimension of $(name(dict)) ($(dimension(dict)))"))
     end
@@ -129,7 +129,7 @@ module PDEs
         PDE(blocks, vcat([block.lhs for block in blocks]...), vcat([reshape(block.rhs,length(block.rhs)) for block in blocks]...))
     PDE(rules::PDERule...) =
         PDE(PDEBlock.(rules)...)
-    # Atom slows down 
+    # Atom slows down
     Base.show(io::IO,::PDE) = Base.show(io,PDE)
 end
 @reexport using .PDEs

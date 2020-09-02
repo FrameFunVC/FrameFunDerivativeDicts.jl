@@ -1,7 +1,7 @@
 name = "FrameFunDerivativeDicts"
 uuid = "a044d1c3-f59a-42f8-a12e-6f86ba36b853"
 authors = ["vincentcp"]
-version = "0.1"
+version = "0.1.1"
 
 [deps]
 BasisFunctions = "4343a256-5453-507d-8aad-01a9d7189916"
