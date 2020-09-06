@@ -14,10 +14,16 @@ using SymbolicDifferentialOperators: AbstractDiffOperator, PartialDifferentialOp
     ProductDifferentialOperator, LaplaceOperator, IdentityDifferentialOperator,
     SumDifferentialOperator, full_elements
 
+(L::AbstractDiffOperator)(obj) = _eval(L,obj)
+_eval(L::AbstractDiffOperator, obj) =
+    _eval1(L, obj)
+_eval1(L::AbstractDiffOperator, obj) =
+    _eval2(L, obj)
+_eval2(L::AbstractDiffOperator, obj) = error("Influence of $(typeof(L)) on $(typeof(obj)) is unknown")
 
-(L::AbstractDiffOperator)(dict) = error("Influence of $(typeof(L)) on $(typeof(dict)) is unknown")
-(L::ScaledDifferentialOperator)(exp::Expansion) = expansion(L(dictionary(exp)), coefficients(exp))
-function (L::PartialDifferentialOperator)(dict)
+_eval(L::AbstractDiffOperator, exp::Expansion) = expansion(L(dictionary(exp)), coefficients(exp))
+
+function _eval1(L::PartialDifferentialOperator, dict)
     if dimension(dict)==1
         diff(dict, 1)
     else
@@ -29,14 +35,14 @@ function (L::PartialDifferentialOperator)(dict)
     end
 end
 
-(L::ScaledDifferentialOperator)(dict) =
+_eval1(L::ScaledDifferentialOperator,dict) =
     _eval(L.coeff, L.diff, dict)
 _eval(coef::IdentityCoefficient, diff, dict) =
     diff(dict)
 _eval(coef::ConstantCoefficient, diff, dict) =
     coef.scalar*diff(dict)
 
-function (L::ProductDifferentialOperator)(dict)
+function _eval1(L::ProductDifferentialOperator, dict)
     diff_L = length(dimension_names(L))
     dict_L = dimension(dict)
     if diff_L == dict_L
@@ -55,9 +61,9 @@ end
 
 
 using ..SummationDicts: laplace
-(::LaplaceOperator)(dict) = laplace(dict)
-(::IdentityDifferentialOperator)(dict) = dict
-function (L::SumDifferentialOperator)(dict)
+_eval1(::LaplaceOperator, dict) = laplace(dict)
+_eval1(::IdentityDifferentialOperator, dict) = dict
+function _eval1(L::SumDifferentialOperator, dict)
     if dimension(dict) != length(dimension_names(L))
         throw(DimensionMismatch("To dimensions in $(typeof(L)) ($(length(dimension_names(L)))) do not match the dimension of $(name(dict)) ($(dimension(dict)))"))
     end
